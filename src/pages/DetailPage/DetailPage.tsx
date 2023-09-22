@@ -3,6 +3,8 @@ import { useParams } from 'react-router-dom';
 import { fetchCharacterDetail } from '../../api/api';
 import styled from 'styled-components'
 import { MotionStyled} from '../../styles/styles';
+import { useQuery } from 'react-query';
+import {motion} from 'framer-motion'
 
 const DetailContainer = styled.div`
   display: flex;
@@ -29,37 +31,64 @@ const DetailImg = styled.img`
   object-fit: cover;
 `
 
+const ModalDiv = styled.div`
+  &:hover {
+    cursor: pointer;
+  }
+`
+
+const DisneyModal = styled(motion.div)`
+  width: 80%;
+  height: 80vh;
+  position: fixed;
+  display: flex;
+  top: 10vh;
+  left: 10%;
+`
+
+const CloseBtn = styled.div`
+  width: 50px;
+  height: 50px;
+  border-radius: 100%;
+  background-color: white;
+  color: black;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid black;
+  z-index: 3;
+`
+
 function DetailPage() {
     const { id } = useParams<{ id: string }>();
-    const [character, setCharacter] = useState<any | null>(null);
-    const [isloading, setIsLoading] = useState(true);
-    const [isloadingtemp, setIsLoadingTemp] = useState(true);
-    const [error, setError] = useState(null);
+    // const [isloadingtemp, setIsLoadingTemp] = useState(true);
+    // const [error, setError] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        if(id){
-            const data = await fetchCharacterDetail(id);
-            setCharacter(data);
-        }else{
-            console.log('id가 없습니다')
-        }
-      } catch (e:any) {
-        setError(e);
-      }
-      setIsLoadingTemp(false)
+
+    const { data: character, isError, isLoading } = useQuery(
+      ['character', id], 
+      () => {
+        if (id === undefined) throw new Error("Character ID is undefined");
+        return fetchCharacterDetail(id);
+      },
+      { enabled: !!id }
+    );
+
+    const handleModalTriggerClick = () => {
+      setIsModalOpen(!isModalOpen);
     };
-    fetchData();
 
-  }, [id]);
+    console.log(character)
 
-    if (isloadingtemp) {
-        return <div>Loading...</div>;
+    if (isLoading) {
+      return <div>Loading...</div>;
     }
 
-    if(character === null){
-
+    if (isError) {
       const tempCharacter = {
         id: "404",
         name: "해당 데이터가 없습니다.",
@@ -86,22 +115,33 @@ function DetailPage() {
       )
     }
 
-    console.log(character)
-
     return (
       <DetailContainer>
-        <DetailImg src={character.imageUrl} alt={character.name} />
+        <MotionStyled to="/"  style={{fontSize : '25px'}}>back</MotionStyled>
+        <DetailImg src={character?.imageUrl} alt={character?.name} />
         <h1>{character.name}</h1>
-        
-        <MotionStyled to={character.sourceUrl} target="_blank" style={{fontSize : '25px'}}>
+
+        <ModalDiv onClick={handleModalTriggerClick} style={{fontSize : '25px'}}>
           Source URL
-        </MotionStyled>
+        </ModalDiv>
   
         <FilmList>
-          {character.films.map((film: string, index: number) => (
-            <li key={index}>{film}</li>
+          {character?.films.map((film: string, index: number) => (
+            <li key={index} style={{fontSize: '19px'}}>{film}</li>
           ))}
         </FilmList>
+
+        {
+          isModalOpen && (
+            <DisneyModal
+              initial={{ opacity: 0, scale: 0.1 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 1 }}>
+              <iframe src={character?.sourceUrl} title={character?.name} style={{width: '100%', height: '100%', borderRadius: "8px" }}></iframe>
+              <CloseBtn onClick={handleModalTriggerClick}>X</CloseBtn>
+            </DisneyModal>
+          )
+        }
       </DetailContainer>
     );
 }
