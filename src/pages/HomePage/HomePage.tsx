@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { fetchAllCharacters } from '../../api/api';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import {useForm} from 'react-hook-form';
 import { MotionStyled } from '../../styles/styles';
-import { darkMode } from '../../utils/atoms';
-import { useRecoilState } from 'recoil';
+import { debounce } from "lodash"
+import { useQuery } from 'react-query';
 
 const FormDiv = styled.div`
   width: 100%;
@@ -82,60 +82,62 @@ function CharacterImage({ src, alt }: { src: string; alt: string }) {
   }
 
 function HomePage() {
-    const [characters, setCharacters] = useState([]);
-    const [isloading, setIsLoading] = useState(true);
-    const [error, setError] = useState(null);
     const [cardsPerRow, setCardsPerRow] = useState<number>(0);
-    const {register, watch, setValue} = useForm();
+    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState<string>('');
+
+    const { register, watch, handleSubmit } = useForm();
     const searchTerm = watch('searchTerm', '');
-    const [displayCount, setDisplayCount] = useState<number>(50);
-    // const [isdarkmode, setisDarkMode] = useRecoilState(darkMode);
+    const displayCount = watch('displayCount', 50);
 
-    const filteredCharacters = useMemo(() => {
-        return characters.filter((character: any) => {
-            return character.name.toLowerCase().includes(searchTerm.toLowerCase());
-        })
-    }, [characters, searchTerm])
+    useEffect(() => {
+        const debouncedUpdate = debounce(() => setDebouncedSearchTerm(searchTerm), 1000);
+        debouncedUpdate();
+        return () => debouncedUpdate.cancel();
+    }, [searchTerm]);
 
-    const displayedCharacters = useMemo(() => {
-        return filteredCharacters.slice(0, displayCount);
-      }, [filteredCharacters, displayCount]);
-
-    const handleChangeDisplayCount = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        setDisplayCount(Number(event.target.value));
-    }
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await fetchAllCharacters();
-        setCharacters(data);
-      } catch (e:any) {
-        setError(e);
+    const { data: allCharacters, isLoading, isError } = useQuery(
+      ['characters', debouncedSearchTerm, displayCount],
+      async () => {
+          const characters = await fetchAllCharacters();
+          let result = characters;
+          if (debouncedSearchTerm) {
+              result = result.filter((character: any) =>
+                  character.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
+              );
+          }
+          return result.slice(0, displayCount);
+      },
+      {
+          // enabled: true // debouncedSearchTerm과 상관 없이 항상 쿼리 활성화
       }
-      setIsLoading(false);
-    };
-    fetchData();
+  );
 
-    const updateCardsPerRow = () => {
-        const cardWidth = 200 + 16 * 2 + 2; // 카드 너비 + 마진 + 테두리
-        setCardsPerRow(Math.floor(window.innerWidth / cardWidth) - 1);
-      };
+    useEffect(() => {
+      const updateCardsPerRow = () => {
+          const cardWidth = 200 + 16 * 2 + 2; // 카드 너비 + 마진 + 테두리
+          setCardsPerRow(Math.floor(window.innerWidth / cardWidth) - 1);
+        };
+    
+        window.addEventListener('resize', updateCardsPerRow);
+        updateCardsPerRow(); // 초기 로드 시 호출
+    }, [])
+
+
+    const onValid = (data: any) => console.log(data, "onvalid");
+    const onInvalid = (data: any) => console.log(data, "onInvalid");
   
-      window.addEventListener('resize', updateCardsPerRow);
-      updateCardsPerRow(); // 초기 로드 시 호출
-  }, []);
 
-  useEffect(() => {
-    setValue('displayCount', displayCount)
-  }, [displayCount, setValue])
+    if (isLoading) return <span>isLoading...</span>;
+    if (isError) return <span>Error: {isError}</span>;
+    if (!allCharacters) return null;
 
-  if (isloading) return <div>Loading...</div>; // 나중에 로딩 애니메이션 추가 예정
-  if (error) return <div>Error loading data</div>;
+    if(cardsPerRow === 0) {
+      return <div> cardsPerRow = 0 </div>
+    };
 
   return (
     <div>
-      <form style={{marginBottom: '16px'}}>
+      <form style={{marginBottom: '16px'}} onSubmit={handleSubmit(onValid, onInvalid)} >
         <FormDiv>
           <input {
               ...register('searchTerm')
@@ -147,7 +149,6 @@ function HomePage() {
           <select {
               ...register('displayCount')
           }
-          onChange={handleChangeDisplayCount}
           value={displayCount}
           style={{ padding: '8px' }}
           >
@@ -160,12 +161,12 @@ function HomePage() {
         </FormDiv>
       </form>
       <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-        {displayedCharacters.map((character: any, index: number) => (
+        {allCharacters.map((character: any, index: number) => (
 
           <MotionStyled to={`/character/${character.id}`}
             initial={{ opacity: 0, y: -50 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: Math.floor(index / cardsPerRow) * 0.6 }}
+            transition={{ delay: Math.max(0, Math.floor(index / cardsPerRow) * 0.6) }}
             key={character.id}>
                {/* backgroundColor: isdarkmode ? 'white' : 'black', color: isdarkmode ? 'black' : 'white' */}
             <Card
