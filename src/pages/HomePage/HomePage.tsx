@@ -24,7 +24,7 @@ const FormDiv = styled.div`
     border: 1px solid ${(props) => props.theme.cardBackground};
     margin-right: 16px;
     height: 100%;
-    font-size: 1.2rem;
+    font-size: 16px;
   }
 
   select {
@@ -51,7 +51,7 @@ const Card = styled(motion.div)`
   font-size: 1.2rem;
   background-color: ${(props) => props.theme.cardBackground};
   color: ${(props) => props.theme.text};
-  transition: transform 0.3s ease-in-out;
+  transition: transform 0.1s ease-in-out;
 `;
 
 const Image = styled.img`
@@ -157,16 +157,17 @@ function HomePage() {
               <option value="20">20개 보기</option>
               <option value="50">50개 보기</option>
               <option value="100">100개 보기</option>
+              <option value="3000">상남자식 전부 보기</option>
           </select>
         </FormDiv>
       </form>
-      <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
         {allCharacters.map((character: any, index: number) => (
 
           <MotionStyled to={`/character/${character.id}`}
             initial={{ opacity: 0, y: -50 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: Math.max(0, Math.floor(index / cardsPerRow) * 0.6) }}
+            transition={{ delay: Math.max(0, Math.floor(index / cardsPerRow) * 0.3) }}
             key={character.id}>
                {/* backgroundColor: isdarkmode ? 'white' : 'black', color: isdarkmode ? 'black' : 'white' */}
             <Card

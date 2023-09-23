@@ -5,6 +5,7 @@ import styled from 'styled-components'
 import { MotionStyled} from '../../styles/styles';
 import { useQuery } from 'react-query';
 import {motion} from 'framer-motion'
+import Loader from '../../utils/Loader';
 
 const DetailContainer = styled.div`
   display: flex;
@@ -67,15 +68,19 @@ function DetailPage() {
     // const [isloadingtemp, setIsLoadingTemp] = useState(true);
     // const [error, setError] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isWait, setisWait] = useState(true); 
 
 
     const { data: character, isError, isLoading } = useQuery(
       ['character', id], 
-      () => {
+      () => {       
         if (id === undefined) throw new Error("Character ID is undefined");
+        setTimeout(()=>{ setisWait(false) }, 2000);
         return fetchCharacterDetail(id);
       },
       { enabled: !!id }
+
+      
     );
 
     const handleModalTriggerClick = () => {
@@ -85,8 +90,14 @@ function DetailPage() {
     console.log(character)
 
     if (isLoading) {
-      return <div>Loading...</div>;
+      return <Loader />
     }
+
+    if (isWait) {
+      return <Loader />
+    }
+
+
 
     if (isError) {
       const tempCharacter = {
@@ -99,6 +110,7 @@ function DetailPage() {
 
       return (
         <DetailContainer>
+        <MotionStyled to="/"  style={{fontSize : '25px'}}>back</MotionStyled>
         <DetailImg src={tempCharacter.imageUrl} alt={tempCharacter.name} />
         <h1>{tempCharacter.name}</h1>
         
