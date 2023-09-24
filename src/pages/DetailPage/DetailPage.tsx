@@ -78,6 +78,10 @@ const CloseBtn = styled.div`
   align-items: center;
   border: 1px solid black;
   z-index: 3;
+
+  &:hover {
+    cursor: pointer;
+  }
 `
 
 function DetailPage() {
