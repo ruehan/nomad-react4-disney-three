@@ -64,22 +64,23 @@ const Image = styled.img`
 
 
 function CharacterImage({ src, alt }: { src: string; alt: string }) {
-    const [imageSrc, setImageSrc] = useState('https://www.salonlfc.com/wp-content/uploads/2018/01/image-not-found-1-scaled-1150x647.png'); // 여기에 로딩 이미지의 경로를 지정하세요
-    const [error, setError] = useState(false);
+    // const [imageSrc, setImageSrc] = useState('https://www.salonlfc.com/wp-content/uploads/2018/01/image-not-found-1-scaled-1150x647.png'); // 여기에 로딩 이미지의 경로를 지정하세요
+    // const [error, setError] = useState(false);
     
-    const handleImageLoad = () => {
-      setImageSrc(src);
-    };
+    // const handleImageLoad = () => {
+    //   setImageSrc(src);
+    // };
   
-    const handleImageError = () => {
+    // const handleImageError = () => {
     //   setError(true);
-    };
+    // };
   
-    if (error) {
-      return <div>이미지를 불러올 수 없습니다</div>;
-    }
+    // if (error) {
+    //   return <div>이미지를 불러올 수 없습니다</div>;
+    // }
   
-    return <Image src={src} alt={alt} onLoad={handleImageLoad} onError={handleImageError} />;
+    // return <Image src={src} alt={alt} onLoad={handleImageLoad} onError={handleImageError} />;
+    return <Image src={src} alt={alt} />;
   }
 
 function HomePage() {

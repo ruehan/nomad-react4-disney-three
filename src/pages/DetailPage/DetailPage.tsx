@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { fetchCharacterDetail } from '../../api/api';
 import styled from 'styled-components'
@@ -78,6 +78,10 @@ const CloseBtn = styled.div`
   align-items: center;
   border: 1px solid black;
   z-index: 3;
+
+  &:hover {
+    cursor: pointer;
+  }
 `
 
 function DetailPage() {
