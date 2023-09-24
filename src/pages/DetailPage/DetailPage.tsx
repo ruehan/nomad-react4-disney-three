@@ -25,7 +25,7 @@ const FilmList = styled.div`
   width: 50%;
   /* border: 1px solid ${(props) => props.theme.text}; */
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
@@ -46,6 +46,7 @@ const DetailImg = styled.img`
   height: 200px;
   border-radius: 100%;
   object-fit: cover;
+  border: 1px solid ${(props) => props.theme.text};
 `
 
 const ModalDiv = styled.div`
