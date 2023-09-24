@@ -6,6 +6,7 @@ import { MotionStyled} from '../../styles/styles';
 import { useQuery } from 'react-query';
 import {motion} from 'framer-motion'
 import Loader from '../../utils/Loader';
+import {TiArrowBack as BackArrow} from 'react-icons/ti'
 
 const DetailContainer = styled.div`
   display: flex;
@@ -112,8 +113,6 @@ function DetailPage() {
       return <Loader />
     }
 
-
-
     if (isError) {
       const tempCharacter = {
         id: "404",
@@ -125,7 +124,7 @@ function DetailPage() {
 
       return (
         <DetailContainer>
-        <MotionStyled to="/"  style={{fontSize : '25px'}}>back</MotionStyled>
+        <MotionStyled to="/"  style={{fontSize : '30px'}}><BackArrow /></MotionStyled>
         <DetailImg src={tempCharacter.imageUrl} alt={tempCharacter.name} />
         <h1>{tempCharacter.name}</h1>
         
@@ -144,7 +143,7 @@ function DetailPage() {
 
     return (
       <DetailContainer>
-        <MotionStyled to="/"  style={{fontSize : '25px'}}>back</MotionStyled>
+        <MotionStyled to="/"  style={{fontSize : '30px'}}><BackArrow /></MotionStyled>
         <DetailImg src={character?.imageUrl} alt={character?.name} />
         <h1>{character.name}</h1>
 
