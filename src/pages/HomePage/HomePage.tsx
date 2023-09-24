@@ -6,6 +6,7 @@ import {useForm} from 'react-hook-form';
 import { MotionStyled } from '../../styles/styles';
 import { debounce } from "lodash"
 import { useQuery } from 'react-query';
+import Loader from '../../utils/Loader';
 
 const FormDiv = styled.div`
   width: 100%;
@@ -127,7 +128,7 @@ function HomePage() {
     const onInvalid = (data: any) => console.log(data, "onInvalid");
   
 
-    if (isLoading) return <span>isLoading...</span>;
+    if (isLoading) return <Loader />;
     if (isError) return <span>Error: {isError}</span>;
     if (!allCharacters) return null;
 
