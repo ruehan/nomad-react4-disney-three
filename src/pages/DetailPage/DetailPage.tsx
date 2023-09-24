@@ -18,12 +18,27 @@ const DetailContainer = styled.div`
 `;
 
 
-const FilmList = styled.ul`
+const FilmList = styled.div`
   margin-top: 1em;
-  list-style-type: disc;
   padding-left: 1em;
-  
+  width: 50%;
+  /* border: 1px solid ${(props) => props.theme.text}; */
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5em;
+  /* font-weight: bold; */
 `;
+
+const Film = styled.div`
+  border: 1px solid ${(props) => props.theme.text};
+  margin: 5px;
+  padding: 3px;
+  border-radius: 5px;
+  background-color: ${(props) => props.theme.cardBackground};
+`
 
 const DetailImg = styled.img`
   width: 200px;
@@ -139,7 +154,7 @@ function DetailPage() {
   
         <FilmList>
           {character?.films.map((film: string, index: number) => (
-            <li key={index} style={{fontSize: '19px'}}>{film}</li>
+            <Film key={index}>{film}</Film>
           ))}
         </FilmList>
 
