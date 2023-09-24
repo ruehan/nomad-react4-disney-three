@@ -36,8 +36,8 @@ const FilmList = styled.div`
 const Film = styled.div`
   border: 1px solid ${(props) => props.theme.text};
   margin: 5px;
-  padding: 3px;
-  border-radius: 5px;
+  padding: 5px;
+  border-radius: 7px;
   background-color: ${(props) => props.theme.cardBackground};
 `
 
